@@ -5,7 +5,7 @@
 **OpenClaw 飞书插件流式卡片补丁 · 10 秒拖拽感 → 1.5 秒丝滑输出**
 
 ![Platform](https://img.shields.io/badge/OpenClaw-2026.8.1-6E40C7)
-[![Symptom](https://img.shields.io/badge/%E7%97%87%E7%8A%B6-4~5%E5%AD%97%E5%BE%80%E5%A4%96%E8%B9%A6-ff7b72)](#tldr)
+[![Symptom](https://img.shields.io/badge/%E7%97%87%E7%8A%B6-4~5%E5%AD%97%E5%BE%80%E5%A4%96%E8%B9%A6-ff7b72)](#一句话结论)
 [![Fix](https://img.shields.io/badge/%E4%BF%AE%E5%A4%8D-3%20%E5%A4%84%E8%A1%A5%E4%B8%81-238636)](#%E4%BF%AE%E5%A4%8D)
 [![PUTs](https://img.shields.io/badge/PUT%20%E6%AC%A1%E6%95%B0-40%20%E2%86%92%203-1f6feb)](#%E6%8E%92%E6%9F%A5%E8%BF%87%E7%A8%8B)
 
@@ -21,7 +21,7 @@
 
 针对 OpenClaw（v2026.8.1）官方飞书插件 `@openclaw/feishu` 的流式回复卡顿问题的根因分析与补丁。
 
-## TL;DR
+## 一句话结论
 
 插件的一个"善意"优化——句末标点等"重要更新"可以**绕过节流**直接推送——在真实网络条件下变成了性能杀手：
 
