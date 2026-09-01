@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="420" viewBox="0 0 920 420" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif">
+  <defs>
+    <linearGradient id="hdr" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1f6feb"/><stop offset="1" stop-color="#8957e5"/>
+    </linearGradient>
+  </defs>
+  <rect width="920" height="420" fill="#0d1117"/>
+  <rect x="0" y="0" width="920" height="64" fill="url(#hdr)"/>
+  <text x="460" y="40" text-anchor="middle" font-size="26" font-weight="700" fill="#ffffff">飞书流式卡片卡顿：40 次 PUT 的队列积压 vs 3 次合并推送</text>
+
+  <!-- BEFORE panel -->
+  <text x="40" y="100" font-size="17" font-weight="700" fill="#ff7b72">修复前 —— "重要帧"绕过节流，串行 PUT 队列积压</text>
+  <line x1="60" y1="130" x2="860" y2="130" stroke="#30363d" stroke-width="2"/>
+  <!-- generation span -->
+  <rect x="60" y="122" width="52" height="16" rx="3" fill="#238636"/>
+  <text x="122" y="134" font-size="11" fill="#7ee787">模型生成 2.6s</text>
+  <!-- dribble of PUTs -->
+  <g fill="#ff7b72">
+    <rect x="60"  y="168" width="10" height="22" rx="2"/><rect x="90"  y="168" width="10" height="22" rx="2"/>
+    <rect x="120" y="168" width="10" height="22" rx="2"/><rect x="150" y="168" width="10" height="22" rx="2"/>
+    <rect x="180" y="168" width="10" height="22" rx="2"/><rect x="210" y="168" width="10" height="22" rx="2"/>
+    <rect x="240" y="168" width="10" height="22" rx="2"/><rect x="270" y="168" width="10" height="22" rx="2"/>
+    <rect x="300" y="168" width="10" height="22" rx="2"/><rect x="330" y="168" width="10" height="22" rx="2"/>
+    <rect x="360" y="168" width="10" height="22" rx="2"/><rect x="390" y="168" width="10" height="22" rx="2"/>
+    <rect x="420" y="168" width="10" height="22" rx="2"/><rect x="450" y="168" width="10" height="22" rx="2"/>
+    <rect x="480" y="168" width="10" height="22" rx="2"/><rect x="510" y="168" width="10" height="22" rx="2"/>
+    <rect x="540" y="168" width="10" height="22" rx="2"/><rect x="570" y="168" width="10" height="22" rx="2"/>
+    <rect x="600" y="168" width="10" height="22" rx="2"/><rect x="630" y="168" width="10" height="22" rx="2"/>
+    <rect x="660" y="168" width="10" height="22" rx="2"/><rect x="690" y="168" width="10" height="22" rx="2"/>
+    <rect x="720" y="168" width="10" height="22" rx="2"/><rect x="750" y="168" width="10" height="22" rx="2"/>
+    <rect x="780" y="168" width="10" height="22" rx="2"/><rect x="810" y="168" width="10" height="22" rx="2"/>
+  </g>
+  <text x="60" y="214" font-size="12" fill="#8b949e">每个句末标点 → 强制更新 → 绕过 160ms 节流 → 入队</text>
+  <text x="60" y="232" font-size="12" fill="#8b949e">PUT 串行执行，每次 ~300ms 网络往返 → 40 个 PUT 排队拖 12s</text>
+  <text x="860" y="255" text-anchor="end" font-size="13" font-weight="700" fill="#ff7b72">卡片"打字"拖了 12 秒 ❌</text>
+
+  <line x1="460" y1="272" x2="460" y2="292" stroke="#30363d" stroke-width="2"/>
+  <polygon points="460,300 453,290 467,290" fill="#30363d"/>
+
+  <!-- AFTER panel -->
+  <text x="40" y="330" font-size="17" font-weight="700" fill="#7ee787">修复后 —— 节流统一生效，pending 合并全量文本</text>
+  <g fill="#7ee787">
+    <rect x="60"  y="350" width="26" height="22" rx="2"/><rect x="330" y="350" width="26" height="22" rx="2"/><rect x="600" y="350" width="26" height="22" rx="2"/>
+  </g>
+  <text x="100" y="366" font-size="12" fill="#8b949e">PUT #1（全量文本）</text>
+  <text x="370" y="366" font-size="12" fill="#8b949e">PUT #2</text>
+  <text x="640" y="366" font-size="12" fill="#8b949e">PUT #3</text>
+  <text x="60" y="398" font-size="12" fill="#8b949e">400ms 节流 ≥ PUT 往返耗时 → 队列零积压，中间帧合并为最新全量</text>
+  <text x="860" y="398" text-anchor="end" font-size="13" font-weight="700" fill="#7ee787">3 次 PUT / 1.5s，平滑 ✅</text>
+</svg>
