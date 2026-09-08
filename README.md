@@ -6,7 +6,7 @@
 
 ![Platform](https://img.shields.io/badge/OpenClaw-2026.8.1-6E40C7)
 [![Symptom](https://img.shields.io/badge/%E7%97%87%E7%8A%B6-4~5%E5%AD%97%E5%BE%80%E5%A4%96%E8%B9%A6-ff7b72)](#一句话结论)
-[![Fix](https://img.shields.io/badge/%E4%BF%AE%E5%A4%8D-3%20%E5%A4%84%E8%A1%A5%E4%B8%81-238636)](#%E4%BF%AE%E5%A4%8D)
+[![Fix](https://img.shields.io/badge/%E4%BF%AE%E5%A4%8D-4%20%E5%A4%84%E8%A1%A5%E4%B8%81-238636)](#%E4%BF%AE%E5%A4%8D)
 [![PUTs](https://img.shields.io/badge/PUT%20%E6%AC%A1%E6%95%B0-40%20%E2%86%92%203-1f6feb)](#%E6%8E%92%E6%9F%A5%E8%BF%87%E7%A8%8B)
 
 **症状一句话**：模型 2.6 秒就生成完了，飞书卡片却"打字"打了 10 秒——每个句末标点都绕过节流触发一次 ~300ms 的串行 PUT，40 个请求排成长队。
@@ -81,13 +81,14 @@ if (!shouldForceUpdate && now - this.lastUpdateTime < this.updateThrottleMs) {
 
 ## 修复
 
-对 `dist/monitor.account-*.js` 打 3 处补丁（本仓库的 `scripts/apply-patch.mjs` 一键完成）：
+对 `dist/monitor.account-*.js` 打 4 处补丁（本仓库的 `scripts/apply-patch.mjs` 一键完成）：
 
 | # | 位置 | 原值 | 新值 | 作用 |
 |---|------|------|------|------|
 | 1 | `update()` 节流条件 | `if (!shouldForceUpdate && now - ...)` | `if (now - ...)` | **核心修复**：节流对所有更新统一生效，中间帧合并进 `pendingText`（不丢内容，下帧为全量文本） |
 | 2 | `STREAMING_UPDATE_THROTTLE_MS` | 160 | 400 | 推送节奏上限 ≈2.5 帧/秒，覆盖大多数 PUT 往返耗时，队列不再积压 |
 | 3 | `STREAMING_SIGNIFICANT_DELTA_CHARS` | 18 | 8 | 保底逻辑：即便走了"重要更新"路径（补丁 1 后已不影响节流），阈值也更贴近真实输出节奏 |
+| 4 | `DEFAULT_TASK_TIMEOUT_MS` | 300 秒 | 1800 秒 | 避免长工具任务超过 5 分钟后被飞书单群队列驱逐、最终回复丢失 |
 
 修复后实测：同一类回复 **3 次 PUT / 1.5s**，卡片动画连续平滑，与 Telegram 体验一致。
 
@@ -104,7 +105,7 @@ node scripts/apply-patch.mjs            # 自动定位插件 dist 并打补丁�
 node scripts/apply-patch.mjs --check    # 只检查当前补丁状态，不修改
 ```
 
-脚本会扫描 `~/.openclaw/npm/projects/**/node_modules/@openclaw/feishu/dist/monitor.account-*.js`，逐条应用 3 处替换，任一条匹配不到即中止报错（0 或多处匹配都会拒绝），不会产生半截补丁。
+脚本会扫描 `~/.openclaw/npm/projects/**/node_modules/@openclaw/feishu/dist/monitor.account-*.js`，逐条应用 4 处替换，任一条匹配不到即中止报错（0 或多处匹配都会拒绝），不会产生半截补丁。
 
 **重要**：`openclaw plugins update feishu` 会用官方包覆盖 dist，补丁会被还原——更新插件后重跑一次脚本即可。建议给这条命令建个别名。
 

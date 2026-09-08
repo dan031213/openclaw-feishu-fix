@@ -2,10 +2,11 @@
 /**
  * OpenClaw 飞书插件流式卡顿补丁
  *
- * 对 @openclaw/feishu v2026.8.1 的 dist/monitor.account-*.js 应用 3 处修改：
+ * 对 @openclaw/feishu 的 dist/monitor.account-*.js 应用 4 处修改：
  *   1. update() 节流条件去掉 `!shouldForceUpdate && ` 前缀（节流对所有更新生效）
  *   2. STREAMING_UPDATE_THROTTLE_MS   160 -> 400
  *   3. STREAMING_SIGNIFICANT_DELTA_CHARS 18 -> 8
+ *   4. DEFAULT_TASK_TIMEOUT_MS 300s -> 1800s（长任务不再被飞书队列提前驱逐）
  *
  * 特性：幂等（已打过的补丁跳过）；任一条匹配 0 次或多次都拒绝执行，不会产生半截补丁。
  * 用法：node apply-patch.mjs [--check]
@@ -32,6 +33,11 @@ const PATCHES = [
     name: "STREAMING_SIGNIFICANT_DELTA_CHARS 18->8",
     find: "STREAMING_SIGNIFICANT_DELTA_CHARS = 18",
     replace: "STREAMING_SIGNIFICANT_DELTA_CHARS = 8",
+  },
+  {
+    name: "DEFAULT_TASK_TIMEOUT_MS 300s->1800s",
+    find: "DEFAULT_TASK_TIMEOUT_MS = 300 * 1e3",
+    replace: "DEFAULT_TASK_TIMEOUT_MS = 1800 * 1e3",
   },
 ];
 
