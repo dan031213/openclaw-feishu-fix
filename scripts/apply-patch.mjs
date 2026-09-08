@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * OpenClaw 飞书插件流式卡顿补丁
+ * OpenClaw 飞书插件补丁
  *
  * 对 @openclaw/feishu 的 dist/monitor.account-*.js 应用 4 处修改：
  *   1. update() 节流条件去掉 `!shouldForceUpdate && ` 前缀（节流对所有更新生效）
